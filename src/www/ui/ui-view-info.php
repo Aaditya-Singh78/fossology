@@ -26,7 +26,6 @@ class ui_view_info extends FO_Plugin
    * User DAO to use
    */
   private $userDao;
-
   function __construct()
   {
     $this->Name    = "view_info";
@@ -175,6 +174,8 @@ class ui_view_info extends FO_Plugin
     return $vars;
   } //ShowSightings()
 
+
+
   /**
    * \brief Display the meta data associated with the file.
    */
@@ -217,28 +218,27 @@ class ui_view_info extends FO_Plugin
         $vars['getMimeTypeName'] = $pmRow['mimetype_name'];
       }
       $this->dbManager->freeResult($result);
-
-      $pmRow = [];
-      // Check if ScanOSS is enabled
-      $sql = "SELECT agent_enabled FROM agent WHERE agent_name ='scanoss' ORDER BY agent_ts LIMIT 1;";
-      $row = $this->dbManager->getSingleRow($sql, [],
+    }
+    $pmRow = [];
+    // Check if ScanOSS is enabled
+    $sql = "SELECT agent_enabled FROM agent WHERE agent_name ='scanoss' ORDER BY agent_ts LIMIT 1;";
+    $row = $this->dbManager->getSingleRow($sql, [],
         __METHOD__ . "checkScanOss");
-      if (!empty($row) && $row["agent_enabled"] == 't') {
-        $sql = "SELECT s.purl, s.matchtype, s.lineranges, s.url, s.filepath " .
-          "FROM scanoss_fileinfo s WHERE s.pfile_fk = $1;";
-        $pmRow = $this->dbManager->getSingleRow($sql, [$row['pfile_fk']],
+    if (!empty($row) && $row["agent_enabled"] == 't') {
+      $sql = "SELECT s.purl, s.matchtype, s.lineranges, s.url, s.filepath " .
+               "FROM scanoss_fileinfo s, uploadtree u where u.uploadtree_pk = $1 and  s.pfile_fk = u.pfile_fk;";
+      $pmRow = $this->dbManager->getSingleRow($sql, [$Item],
           __METHOD__ . "GetFileMatchInfo");
-      }
-      if (!empty($pmRow)) {
-        $vars['purl'] = $pmRow['purl'];
-        $vars['matchType'] = $pmRow['matchtype'];
-        $vars['lineRange'] = $pmRow['lineranges'];
-        $vars['url'] = $pmRow['url'];
-        $vars['path'] = $pmRow['filepath'];
-        $vars['scanossInfo'] = 1;
-      } else {
-        $vars['scanossInfo'] = 0;
-      }
+    }
+    if (!empty($pmRow)) {
+      $vars['purl'] = $pmRow['purl'];
+      $vars['matchType'] = $pmRow['matchtype'];
+      $vars['lineRange'] = $pmRow['lineranges'];
+      $vars['url'] = $pmRow['url'];
+      $vars['path'] = $pmRow['filepath'];
+      $vars['scanossInfo'] = 1;
+    } else {
+      $vars['scanossInfo'] = 0;
     }
     /* display upload origin */
     $sql = "select * from upload where upload_pk=$1";
@@ -264,7 +264,6 @@ class ui_view_info extends FO_Plugin
       $vars['fileUploadDate'] = substr($ts, 0, strrpos($ts, '.'));
     }
     /* display where it was uploaded from */
-
     /* display upload owner*/
     $sql = "SELECT user_name from users, upload where user_pk = user_fk and upload_pk = $1";
     $row = $this->dbManager->getSingleRow($sql, array($Upload), __METHOD__ . "getUploadOwner");
@@ -394,7 +393,7 @@ class ui_view_info extends FO_Plugin
           $entry = [];
           $entry['count'] = $Count;
           $entry['type'] = _($key);
-          $entry['value'] = htmlentities($R["$value"]);
+          $entry['value'] = htmlspecialchars($R["$value"], ENT_QUOTES|ENT_HTML5, 'UTF-8');
           $Count++;
           $vars['packageEntries'][] = $entry;
         }
@@ -407,7 +406,7 @@ class ui_view_info extends FO_Plugin
           $entry = [];
           $entry['count'] = $Count;
           $entry['type'] = _("Requires");
-          $entry['value'] = htmlentities($R['req_value']);
+          $entry['value'] = htmlspecialchars($R["$value"], ENT_QUOTES|ENT_HTML5, 'UTF-8');
           $Count++;
           $vars['packageRequires'][] = $entry;
         }
@@ -429,11 +428,10 @@ class ui_view_info extends FO_Plugin
           $entry = [];
           $entry['count'] = $Count;
           $entry['type'] = _($key);
-          $entry['value'] = htmlentities($R["$value"]);
+          $entry['value'] = htmlspecialchars($R["$value"], ENT_QUOTES|ENT_HTML5, 'UTF-8');
           $Count++;
           $vars['packageEntries'][] = $entry;
         }
-        pg_free_result($result);
 
         $sql = "SELECT * FROM pkg_deb_req WHERE pkg_fk = $1;";
         $this->dbManager->prepare(__METHOD__ . "getPkg_rpm_req", $sql);
@@ -443,7 +441,7 @@ class ui_view_info extends FO_Plugin
           $entry = [];
           $entry['count'] = $Count;
           $entry['type'] = _("Depends");
-          $entry['value'] = htmlentities($R['req_value']);
+          $entry['value'] = htmlspecialchars($R["$value"], ENT_QUOTES|ENT_HTML5, 'UTF-8');
           $Count++;
           $vars['packageRequires'][] = $entry;
         }
@@ -466,11 +464,10 @@ class ui_view_info extends FO_Plugin
           $entry = [];
           $entry['count'] = $Count;
           $entry['type'] = _($key);
-          $entry['value'] = htmlentities($R["$value"]);
+          $entry['value'] = htmlspecialchars($R["$value"], ENT_QUOTES|ENT_HTML5, 'UTF-8');
           $Count++;
           $vars['packageEntries'][] = $entry;
         }
-        pg_free_result($result);
 
         $sql = "SELECT * FROM pkg_deb_req WHERE pkg_fk = $1;";
         $this->dbManager->prepare(__METHOD__ . "getPkg_rpm_req", $sql);
@@ -480,7 +477,7 @@ class ui_view_info extends FO_Plugin
           $entry = [];
           $entry['count'] = $Count;
           $entry['type'] = _("Build-Depends");
-          $entry['value'] = htmlentities($R['req_value']);
+          $entry['value'] = htmlspecialchars($R["$value"], ENT_QUOTES|ENT_HTML5, 'UTF-8');
           $Count++;
           $vars['packageRequires'][] = $entry;
         }

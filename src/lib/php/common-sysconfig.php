@@ -279,6 +279,12 @@ function Populate_sysconfig()
   $valueArray[$variable] = array("'$variable'", "null", "'$oidcPrompt'",
     strval(CONFIG_TYPE_TEXT), "'OauthSupport'", "15", "'$oidcDesc'", "null", "null");
 
+  $variable = "OidcScope";
+  $prompt = _('OIDC Scope');
+  $desc = _('Scope of OIDC for client_credential grant. Used with LicenseDB.');
+  $valueArray[$variable] = array("'$variable'", "''", "'$prompt'",
+    strval(CONFIG_TYPE_TEXT), "'OauthSupport'", "16", "'$oidcDesc'", "null", "null");
+
   /*  Banner Message */
   $variable = "BannerMsg";
   $bannerMsgPrompt = _('Banner message');
@@ -527,6 +533,13 @@ function Populate_sysconfig()
     strval(CONFIG_TYPE_BOOL), "'USER_READ_ONLY'", "1", "'$desc'",
     "'check_boolean'", "null");
 
+  $variable = "LicenseTypes";
+  $licenseTypeTitle = _("License Types");
+  $contextValue = "Permissive, Strong Copyleft, Weak Copyleft";
+  $licenseTypeDesc = _("add comma (,) separated different license types");
+  $valueArray[$variable] = array("'$variable'", "'$contextValue'", "'$licenseTypeTitle'",
+    strval(CONFIG_TYPE_TEXT), "'LICENSE'", "1", "'$licenseTypeDesc'", "null", "null");
+
   /* SoftwareHeritage agent config */
   $variable = "SwhURL";
   $prompt = _('SoftwareHeritage URL');
@@ -573,6 +586,44 @@ function Populate_sysconfig()
   $valueArray[$variable] = array("'$variable'",
     "''", "'$prompt'",
     strval(CONFIG_TYPE_TEXT), "'SSS'", "2", "'$desc'", "null", "null");
+
+  /* LicenseDB config */
+  $variable = "LicenseDBBaseURL";
+  $prompt = _('LicenseDB API base URI');
+  $desc = _('Base URI for API calls e.g. /api/v1');
+  $valueArray[$variable] = array("'$variable'", "'http://localhost:8080/api/v1'",
+    "'$prompt'", strval(CONFIG_TYPE_TEXT), "'LicenseDB'", "1", "'$desc'", "null",
+    "null");
+
+  $variable = "LicenseDBHealth";
+  $prompt = _('Health check');
+  $desc = _('Endpoint to check health of LicenseDB service');
+  $valueArray[$variable] = array("'$variable'", "'/health'", "'$prompt'",
+    strval(CONFIG_TYPE_TEXT), "'LicenseDB'", "2", "'$desc'", "null", "null");
+
+  $variable = "LicenseDBContent";
+  $prompt = _('Export endpoint Licenses');
+  $desc = _('Endpoint to Export licenses in JSON e.g. /licenses/export');
+  $valueArray[$variable] = array("'$variable'", "'/licenses/export'", "'$prompt'",
+    strval(CONFIG_TYPE_TEXT), "'LicenseDB'", "3", "'$desc'", "null", "null");
+
+  $variable = "LicenseDBContentObligations";
+  $prompt = _('Export endpoint Obligations');
+  $desc = _('Endpoint to Export Obligations in JSON e.g. /obligations/export');
+  $valueArray[$variable] = array("'$variable'", "'/obligations/export'", "'$prompt'",
+    strval(CONFIG_TYPE_TEXT), "'LicenseDB'", "4", "'$desc'", "null", "null");
+
+  $variable = "LicenseDBToken";
+  $prompt = _('Auth token For LicenseDB');
+  $desc = _("Token from LicenseDB. Do not set if using OIDC for LicenseDB and FOSSology communication.");
+  $valueArray[$variable] = array("'$variable'", "''", "'$prompt'",
+    strval(CONFIG_TYPE_PASSWORD), "'LicenseDB'", "5", "'$desc'", "null", "null");
+
+  $variable = "ExcludeFolders";
+  $mimeTypeToSkip = _("Exclude Folders from scanning");
+  $mimeTypeDesc = _("Add comma (,) separated folder patterns to exclude from unpacking");
+  $valueArray[$variable] = array("'$variable'", "null", "'$mimeTypeToSkip'",
+    strval(CONFIG_TYPE_TEXT), "'Skip'", "1", "'$mimeTypeDesc'", "null", "null");
 
   /* Doing all the rows as a single insert will fail if any row is a dupe.
    So insert each one individually so that new variables get added.
@@ -825,3 +876,4 @@ function get_system_load_average()
 
   return '<button type="button" aria-disabled="true" disabled class="btn '.$class.'">System Load</button>';
 }
+

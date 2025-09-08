@@ -221,6 +221,10 @@ $app->group('/uploads',
       $app->patch('/copyrights/{hash:.*}', CopyrightController::class . ':restoreFileCopyright');
       $app->put('/copyrights/{hash:.*}', CopyrightController::class . ':updateFileCopyright');
       $app->get('/totalcopyrights', CopyrightController::class . ':getTotalFileCopyrights');
+      $app->get('/scancode-copyrights', CopyrightController::class . ':getFileScanCodeCopyrights');
+      $app->delete('/scancode-copyrights/{hash:.*}', CopyrightController::class . ':deleteFileScanCodeCopyright');
+      $app->patch('/scancode-copyrights/{hash:.*}', CopyrightController::class . ':restoreFileScanCodeCopyright');
+      $app->put('/scancode-copyrights/{hash:.*}', CopyrightController::class . ':updateFileScanCodeCopyright');
       $app->get('/user-copyrights', CopyrightController::class . ':getFileUserCopyrights');
       $app->delete('/user-copyrights/{hash:.*}', CopyrightController::class . ':deleteFileUserCopyright');
       $app->patch('/user-copyrights/{hash:.*}', CopyrightController::class . ':restoreFileUserCopyright');
@@ -230,14 +234,26 @@ $app->group('/uploads',
       $app->delete('/emails/{hash:.*}', CopyrightController::class . ':deleteFileEmail');
       $app->patch('/emails/{hash:.*}', CopyrightController::class . ':restoreFileEmail');
       $app->put('/emails/{hash:.*}', CopyrightController::class . ':updateFileEmail');
+      $app->get('/scancode-emails', CopyrightController::class . ':getFileScanCodeEmail');
+      $app->delete('/scancode-emails/{hash:.*}', CopyrightController::class . ':deleteFileScanCodeEmail');
+      $app->patch('/scancode-emails/{hash:.*}', CopyrightController::class . ':restoreFileScanCodeEmail');
+      $app->put('/scancode-emails/{hash:.*}', CopyrightController::class . ':updateFileScanCodeEmail');
       $app->get('/urls', CopyrightController::class . ':getFileUrl');
       $app->delete('/urls/{hash:.*}', CopyrightController::class . ':deleteFileUrl');
       $app->patch('/urls/{hash:.*}', CopyrightController::class . ':restoreFileUrl');
       $app->put('/urls/{hash:.*}', CopyrightController::class . ':updateFileUrl');
+      $app->get('/scancode-urls', CopyrightController::class . ':getFileScanCodeUrl');
+      $app->delete('/scancode-urls/{hash:.*}', CopyrightController::class . ':deleteFileScanCodeUrl');
+      $app->patch('/scancode-urls/{hash:.*}', CopyrightController::class . ':restoreFileScanCodeUrl');
+      $app->put('/scancode-urls/{hash:.*}', CopyrightController::class . ':updateFileScanCodeUrl');
       $app->get('/authors', CopyrightController::class . ':getFileAuthor');
       $app->delete('/authors/{hash:.*}', CopyrightController::class . ':deleteFileAuthor');
       $app->patch('/authors/{hash:.*}', CopyrightController::class . ':restoreFileAuthor');
       $app->put('/authors/{hash:.*}', CopyrightController::class . ':updateFileAuthor');
+      $app->get('/scancode-authors', CopyrightController::class . ':getFileScanCodeAuthor');
+      $app->delete('/scancode-authors/{hash:.*}', CopyrightController::class . ':deleteFileScanCodeAuthor');
+      $app->patch('/scancode-authors/{hash:.*}', CopyrightController::class . ':restoreFileScanCodeAuthor');
+      $app->put('/scancode-authors/{hash:.*}', CopyrightController::class . ':updateFileScanCodeAuthor');
       $app->get('/eccs', CopyrightController::class . ':getFileEcc');
       $app->delete('/eccs/{hash:.*}', CopyrightController::class . ':deleteFileEcc');
       $app->patch('/eccs/{hash:.*}', CopyrightController::class . ':restoreFileEcc');
@@ -277,6 +293,8 @@ $app->group('/obligations',
     $app->delete('/{id:\\d+}', ObligationController::class . ':deleteObligation');
     $app->get('/export-csv', ObligationController::class . ':exportObligationsToCSV');
     $app->post('/import-csv', ObligationController::class . ':importObligationsFromCSV');
+    $app->get('/export-json', ObligationController::class . ':exportObligationsToJSON');
+    $app->post('/import-json', ObligationController::class . ':importObligationsFromJSON');
     $app->any('/{params:.*}', BadRequestController::class);
   });
 
@@ -382,6 +400,8 @@ $app->group('/license',
     $app->get('', LicenseController::class . ':getAllLicenses');
     $app->post('/import-csv', LicenseController::class . ':handleImportLicense');
     $app->get('/export-csv', LicenseController::class . ':exportAdminLicenseToCSV');
+    $app->post('/import-json', LicenseController::class . ':handleImportLicense');
+    $app->get('/export-json', LicenseController::class . ':exportAdminLicenseToJSON');
     $app->post('', LicenseController::class . ':createLicense');
     $app->put('/verify/{shortname:.+}', LicenseController::class . ':verifyLicense');
     $app->put('/merge/{shortname:.+}', LicenseController::class . ':mergeLicense');

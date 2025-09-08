@@ -1,5 +1,7 @@
 # SPDX-FileCopyrightText: © 2017-2023 Siemens AG
 # SPDX-FileCopyrightText: © 2021 Orange by Piotr Pszczola <piotr.pszczola@orange.com>
+# SPDX-FileCopyrightText: © 2025 Tiyasa Kundu <tiyasakundu20@gmail.com>
+# SPDX-FileContributor: Kaushlendra Pratap <kaushlendra-pratap.singh@siemens.com>
 
 # SPDX-License-Identifier: GPL-2.0-only
 
@@ -571,13 +573,29 @@ paths:
       requestBody:
         description: >
           Comment on the status, required for Closed and Rejected states.
-          Ignored for others.
+          Use the application/json for advanced usage.
         content:
           text/plain:
             schema:
               description: The comment for new status
               type: string
               example: "The upload cleared for use."
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                  description: The comment for new status
+                  example: "The upload cleared for use."
+                name:
+                  type: string
+                  description: New name of the upload.
+                  example: my_edited_upload.zip
+                uploadDescription:
+                  type: string
+                  description: Updated description for the upload.
+                  example: This is updated description.
       responses:
         '202':
           description: Upload will be updated
@@ -2716,6 +2734,41 @@ paths:
       requestBody: *cxUpdateBody
       responses: *cxUpdateResponses
 
+  /uploads/{id}/item/{itemId}/scancode-copyrights:
+    parameters: *cxGetParams
+    get:
+      operationId: getFileScanCodeCopyrights
+      tags:
+        - Copyrights
+      summary: Get the scancode copyright findings of the mentioned upload tree ID
+      description: Returns the list of scancode copyright findings associated with the file
+      responses: *cxGetResponses
+  
+  /uploads/{id}/item/{itemId}/scancode-copyrights/{hash}:
+    parameters: *cxUpdateParams
+    delete:
+      operationId: deleteFileScanCodeCopyright
+      tags:
+        - Copyrights
+      summary: Deletes scancode copyright for a file
+      description: Deletes scancode copyright statement for a particular file
+      responses: *cxUpdateResponses
+    patch:
+      operationId: restoreFileScanCodeCopyright
+      tags:
+        - Copyrights
+      summary: Restores scancode copyright for a file
+      description: Restores scancode copyright statement for a particular file
+      responses: *cxUpdateResponses
+    put:
+      operationId: updateFileScanCodeCopyright
+      tags:
+        - Copyrights
+      summary: Updates scancode copyright for a file
+      description: Updates scancode copyright statement for a particular file
+      requestBody: *cxUpdateBody
+      responses: *cxUpdateResponses
+
   /uploads/{id}/item/{itemId}/emails:
     parameters: *cxGetParams
     get:
@@ -2748,6 +2801,41 @@ paths:
         - Copyrights
       summary: Updates an email for a file
       description: Updates an email statement for a particular file
+      requestBody: *cxUpdateBody
+      responses: *cxUpdateResponses
+
+  /uploads/{id}/item/{itemId}/scancode-emails:
+    parameters: *cxGetParams
+    get:
+      operationId: getFileScanCodeEmail
+      tags:
+        - Copyrights
+      summary: Get the scancode email findings of the mentioned upload tree ID
+      description: Returns the list of scancode email findings associated with the file
+      responses: *cxGetResponses
+
+  /uploads/{id}/item/{itemId}/scancode-emails/{hash}:
+    parameters: *cxUpdateParams
+    delete:
+      operationId: deleteFileScanCodeEmail
+      tags:
+        - Copyrights
+      summary: Deletes scancode email finding for a file
+      description: Deletes scancode email finding for a particular file
+      responses: *cxUpdateResponses
+    patch:
+      operationId: restoreFileScanCodeEmail
+      tags:
+        - Copyrights
+      summary: Restores scancode email finding for a file
+      description: Restores scancode email finding for a particular file
+      responses: *cxUpdateResponses
+    put:
+      operationId: updateFileScanCodeEmail
+      tags:
+        - Copyrights
+      summary: Updates scancode email finding for a file
+      description: Updates scancode email finding for a particular file
       requestBody: *cxUpdateBody
       responses: *cxUpdateResponses
 
@@ -2786,6 +2874,41 @@ paths:
       requestBody: *cxUpdateBody
       responses: *cxUpdateResponses
 
+  /uploads/{id}/item/{itemId}/scancode-urls:
+    parameters: *cxGetParams
+    get:
+      operationId: getFileScanCodeUrl
+      tags:
+        - Copyrights
+      summary: Get the scancode url findings of the mentioned upload tree ID
+      description: Returns the list of scancode url findings associated with the file
+      responses: *cxGetResponses
+
+  /uploads/{id}/item/{itemId}/scancode-urls/{hash}:
+    parameters: *cxUpdateParams
+    delete:
+      operationId: deleteFileScanCodeUrl
+      tags:
+        - Copyrights
+      summary: Deletes scancode url finding for a file
+      description: Deletes scancode url finding for a particular file
+      responses: *cxUpdateResponses
+    patch:
+      operationId: restoreFileScanCodeUrl
+      tags:
+        - Copyrights
+      summary: Restores scancode url finding for a file
+      description: Restores scancode url finding for a particular file
+      responses: *cxUpdateResponses
+    put:
+      operationId: updateFileScanCodeUrl
+      tags:
+        - Copyrights
+      summary: Updates scancode url finding for a file
+      description: Updates scancode url finding for a particular file
+      requestBody: *cxUpdateBody
+      responses: *cxUpdateResponses
+
   /uploads/{id}/item/{itemId}/authors:
     parameters: *cxGetParams
     get:
@@ -2818,6 +2941,41 @@ paths:
         - Copyrights
       summary: Updates an author for a file
       description: Updates an author statement for a particular file
+      requestBody: *cxUpdateBody
+      responses: *cxUpdateResponses
+
+  /uploads/{id}/item/{itemId}/scancode-authors:
+    parameters: *cxGetParams
+    get:
+      operationId: getFileScanCodeAuthor
+      tags:
+        - Copyrights
+      summary: Get the scancode author findings of the mentioned upload tree ID
+      description: Returns the list of scancode author findings associated with the file
+      responses: *cxGetResponses
+
+  /uploads/{id}/item/{itemId}/scancode-authors/{hash}:
+    parameters: *cxUpdateParams
+    delete:
+      operationId: deleteFileScanCodeAuthor
+      tags:
+        - Copyrights
+      summary: Deletes scancode author finding for a file
+      description: Deletes scancode author finding for a particular file
+      responses: *cxUpdateResponses
+    patch:
+      operationId: restoreFileScanCodeAuthor
+      tags:
+        - Copyrights
+      summary: Restores scancode author finding for a file
+      description: Restores scancode author finding for a particular file
+      responses: *cxUpdateResponses
+    put:
+      operationId: updateFileScanCodeAuthor
+      tags:
+        - Copyrights
+      summary: Updates scancode author finding for a file
+      description: Updates scancode author finding for a particular file
       requestBody: *cxUpdateBody
       responses: *cxUpdateResponses
 
@@ -2942,6 +3100,17 @@ paths:
       summary: Gets all jobs created by the logged in user
       description: Returns all jobs with their status created by the logged in user
       parameters:
+        - name: status
+          description: Returns only jobs with the selected status.
+          required: false
+          schema:
+            type: string
+            enum:
+              - Processing
+              - Queued
+              - Completed
+              - Failed
+          in: query
         - name: limit
           required: false
           schema:
@@ -2953,6 +3122,14 @@ paths:
           schema:
             type: integer
             minimum: 1
+          in: query
+        - name: sort
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
           in: query
         - name: upload
           required: false
@@ -3019,6 +3196,17 @@ paths:
       summary: Gets all jobs created by all users
       description: Returns all jobs with their status created by every user. This API returns a response only if the requesting user is an Admin.
       parameters:
+        - name: status
+          description: Returns only jobs with the selected status.
+          required: false
+          schema:
+            type: string
+            enum:
+              - Processing
+              - Queued
+              - Completed
+              - Failed
+          in: query
         - name: limit
           required: false
           schema:
@@ -3030,6 +3218,14 @@ paths:
           schema:
             type: integer
             minimum: 1
+          in: query
+        - name: sort
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
           in: query
       responses:
         '200':
@@ -3186,50 +3382,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Job'
-        default:
-          $ref: '#/components/responses/defaultResponse'
-
-  /jobs/history:
-    parameters:
-      - name: upload
-        required: true
-        in: query
-        description: Return jobs for the given upload id
-        schema:
-          type: integer
-    get:
-      operationId: getJobsHistoryPerUpload
-      tags:
-        - Job
-      summary: Get the history of all the jobs queued based on an upload
-      description: Returns the history of all the jobs queued based on an upload
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ShowJob'
-        '400':
-          description: "Bad Request. 'upload' is a required query param"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Info'
-        '403':
-          description: Upload is not accessible
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Info'
-        '404':
-          description: Upload does not exist
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Info'
         default:
           $ref: '#/components/responses/defaultResponse'
 
@@ -5180,6 +5332,18 @@ components:
         ojoDecider:
           type: boolean
           description: Scanners matches if Ojo or REUSE.Software findings are no contradiction with other findings.
+        concludeLicenseType:
+          type: string
+          description: |
+            Auto conclude license if they are of provided type.
+            Omit the field or keep as empty string to not use this option.
+          example: Permissive
+        copyrightDeactivation:
+          type: boolean
+          description: Deactivate false positive copyrights (experimental).
+        copyrightClutterRemoval:
+          type: boolean
+          description: Deactivate false positive copyrights and remove clutter from them (experimental).
     ScanOptions:
       type: object
       properties:
@@ -5218,6 +5382,11 @@ components:
           default: false
           description: >
             Ignore SCM files (Git, SVN, TFS) and files with particular Mimetype
+        excludefolder:
+          type: boolean
+          default: false
+          description: >
+            Ignore Configured Folders from scanning. Admin->Customize->Exclude-Files 
         uploadType:
           type: string
           enum:
@@ -5391,6 +5560,11 @@ components:
             - Queued
             - Processing
           description: Denotes the current status of the job in the queue
+        jobQueue:
+          type: array
+          description: List of child jobs
+          items:
+            $ref: '#/components/schemas/JobQueue'
     Info:
       type: object
       properties:
@@ -5513,6 +5687,9 @@ components:
         ecc:
           type: boolean
           description: Should ECC Analysis be run on this upload.
+        ipra:
+          type: boolean
+          description: Should IPRA Analysis be run on this upload.
         keyword:
           type: boolean
           description: Should keyword Analysis be run on this upload.
@@ -5528,13 +5705,13 @@ components:
         ojo:
           type: boolean
           description: Should OJO Analysis be run on this upload.
-        package:
+        pkgagent:
           type: boolean
           description: Should Package Analysis be run on this upload.
         reso:
           type: boolean
           description: Should REUSE.Software Analysis be run on this upload.
-        heritage:
+        softwareHeritage:
           type: boolean
           description: Should Software Heritage Analysis be run on this upload.
     Reuser:

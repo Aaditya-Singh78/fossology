@@ -27,16 +27,22 @@ PGresult* queryFileIdsForUploadAndLimits(fo_dbManager* dbManager, int uploadId,
                              "SELECT distinct ON(ut.uploadtree_pk, ut.pfile_fk, scopesort) ut.pfile_fk pfile_fk, ut.uploadtree_pk, decision_type,"
                              " CASE cd.scope WHEN 1 THEN 1 ELSE 0 END AS scopesort"
                              " FROM %s AS ut "
-                             " LEFT JOIN clearing_decision cd ON "
-                             "  ((ut.uploadtree_pk = cd.uploadtree_fk AND scope = 0 AND cd.group_fk = $5) "
-                             "  OR (ut.pfile_fk = cd.pfile_fk AND scope = 1)) "
+                             " LEFT JOIN clearing_decision cd ON ("
+                             "  (ut.uploadtree_pk = cd.uploadtree_fk AND cd.scope = 0 AND cd.group_fk = $5)"
+                             "  OR (EXISTS ("
+                             "    SELECT 1 FROM report_info ri WHERE ri.upload_fk=$1 AND ri.ri_globaldecision=1"
+                             "  ) AND ut.pfile_fk = cd.pfile_fk AND cd.scope = 1)"
+                             ")"
                              " WHERE upload_fk=$1 AND (ufile_mode&x'3C000000'::int)=0 AND (lft BETWEEN $2 AND $3) AND ut.pfile_fk != 0"
                              " ORDER BY ut.uploadtree_pk, scopesort, ut.pfile_fk, clearing_decision_pk DESC"
                              ") itemView WHERE decision_type!=$4 OR decision_type IS NULL";
   char* nonVoidPfile = "SELECT pfile_fk FROM allPfileData"
-                       " WHERE pfile_fk NOT IN (SELECT pfile_fk FROM license_file WHERE rf_fk IN"
-                       " (SELECT rf_pk FROM " LICENSE_REF_TABLE
-                       " WHERE rf_shortname = ANY(VALUES('No_license_found'), ('Void'))))";
+                       " WHERE pfile_fk NOT IN (SELECT lf.pfile_fk"
+                       " FROM license_file lf"
+                       " JOIN ars_master am ON lf.agent_fk = am.agent_fk"
+                       " JOIN " LICENSE_REF_TABLE " lr ON lf.rf_fk = lr.rf_pk"
+                       " WHERE am.upload_fk = $1"
+                       " AND lr.rf_shortname = ANY(VALUES('No_license_found'), ('Void')))";
 
   if (!ignoreIrre && !scanFindings)
   {

@@ -71,6 +71,7 @@ COPY --from=builder /fossology/run-deps /opt/run-deps
 
 COPY ./utils/automation/fossologyscanner.py /bin/fossologyscanner
 COPY ./utils/automation/FoScanner /bin/FoScanner
+COPY ./utils/automation/ScanDeps /bin/ScanDeps
 COPY ./utils/automation/requirements.txt /bin/
 
 RUN echo 'APT::Install-Recommends "0" ; APT::Install-Suggests "0" ;' >> /etc/apt/apt.conf \
@@ -81,4 +82,8 @@ RUN echo 'APT::Install-Recommends "0" ; APT::Install-Suggests "0" ;' >> /etc/apt
  && DEBIAN_FRONTEND=noninteractive apt-get autoremove --yes \
  && rm -rf /var/lib/apt/lists/* /opt/run-deps /bin/requirements.txt
 
-CMD ["bash"]
+ENV PYTHONUNBUFFERED=1
+
+CMD [ "bash", "-c" ]
+
+ENTRYPOINT [ "bash", "-c" ]

@@ -18,6 +18,7 @@ use Fossology\Lib\Exception;
 use Fossology\Lib\Util\StringOperation;
 
 require_once 'SpdxTwoImportSource.php';
+require_once 'SpdxThreeImportSource.php';
 require_once 'XmlImportSource.php';
 require_once 'ReportImportSink.php';
 require_once 'ReportImportHelper.php';
@@ -30,6 +31,13 @@ class ReportImportAgent extends Agent
 {
   const REPORT_KEY = "report";
   const ACLA_KEY = "addConcludedAsDecisions";
+  const ACLAO_KEY = "addConcludedAsDecisionsOverwrite";
+  const ACLATBD_KEY = "addConcludedAsDecisionsTBD";
+  const ALIFI_KEY = "addLicenseInfoFromInfoInFile";
+  const ALFC_KEY = "addLicenseInfoFromConcluded";
+  const ANLA_KEY = "addNewLicensesAs";
+  const LMATCH_KEY = "licenseMatch";
+  const COPYRIGHTS_KEY = "addCopyrights";
 
   /** @var UploadDao */
   private $uploadDao;
@@ -55,8 +63,16 @@ class ReportImportAgent extends Agent
     $this->licenseDao = $this->container->get('dao.license');
     $this->clearingDao = $this->container->get('dao.clearing');
     $this->copyrightDao = $this->container->get('dao.copyright');
+    
     $this->agentSpecifLongOptions[] = self::REPORT_KEY.':';
     $this->agentSpecifLongOptions[] = self::ACLA_KEY.':';
+    $this->agentSpecifLongOptions[] = self::ACLAO_KEY.':';
+    $this->agentSpecifLongOptions[] = self::ACLATBD_KEY.':';
+    $this->agentSpecifLongOptions[] = self::ALIFI_KEY.':';
+    $this->agentSpecifLongOptions[] = self::ALFC_KEY.':';
+    $this->agentSpecifLongOptions[] = self::ANLA_KEY.':';
+    $this->agentSpecifLongOptions[] = self::LMATCH_KEY.':';
+    $this->agentSpecifLongOptions[] = self::COPYRIGHTS_KEY.':';
 
     $this->setAgent_PK();
   }
@@ -78,44 +94,12 @@ class ReportImportAgent extends Agent
     $this->agent_pk = intval($row['agent_pk']);
   }
 
-  /**
-   * @param string[] $args
-   * @param string $longArgsKey
-   *
-   * Duplicate of function in file ../../spdx2/agent/spdx2utils.php
-   */
-  static private function preWorkOnArgsFlp(&$args,$longArgsKey)
-  {
-    if (is_array($args) &&
-      array_key_exists($longArgsKey, $args)){
-      echo "DEBUG: unrefined \$longArgs are: ".$args[$longArgsKey]."\n";
-      $chunks = explode(" --", $args[$longArgsKey]);
-      if(sizeof($chunks) > 1)
-      {
-        $args[$longArgsKey] = $chunks[0];
-        foreach(array_slice($chunks, 1) as $chunk)
-        {
-          if (strpos($chunk, '=') !== false)
-          {
-            list($key, $value) = explode('=', $chunk, 2);
-            $args[$key] = $value;
-          }
-          else
-          {
-            $args[$chunk] = true;
-          }
-        }
-      }
-    }
-  }
-
   function processUploadId($uploadId)
   {
     $this->heartbeat(0);
 
-    self::preWorkOnArgsFlp($this->args, self::REPORT_KEY);
-
     $reportPre = array_key_exists(self::REPORT_KEY,$this->args) ? $this->args[self::REPORT_KEY] : "";
+    $reportPre = trim($reportPre, "\"'");
     global $SysConf;
     $fileBase = $SysConf['FOSSOLOGY']['path'] . "/ReportImport/";
     $report = $fileBase . $reportPre;
@@ -153,7 +137,7 @@ class ReportImportAgent extends Agent
   {
     $pfilesByFilename = self::getEntriesForFilename($fileName, $pfilePerFileName);
 
-    if (($pfilesByFilename !== null || sizeof($pfilesByFilename) === 0))
+    if (($pfilesByFilename !== null && sizeof($pfilesByFilename) > 0))
     {
       if ( $hashMap !== null && sizeof($hashMap) > 0 )
       {
@@ -226,18 +210,32 @@ class ReportImportAgent extends Agent
 
   /**
    * @param string $reportFilename
-   * @return SpdxTwoImportSource|XmlImportSource
+   * @return SpdxTwoImportSource|SpdxThreeImportSource|XmlImportSource
    * @throws \Exception
    */
   private function getImportSource($reportFilename)
   {
 
-    if (StringOperation::stringEndsWith($reportFilename, ".rdf") ||
+    if(StringOperation::stringEndsWith($reportFilename, ".rdf") ||
       StringOperation::stringEndsWith($reportFilename, ".rdf.xml") ||
-      StringOperation::stringEndsWith($reportFilename, ".ttl")) {
-      $importSource = new SpdxTwoImportSource($reportFilename);
-      if($importSource->parse()) {
-        return $importSource;
+      StringOperation::stringEndsWith($reportFilename, ".ttl")){
+    /**
+     * @param string $version
+     * @return specVersion for RDF report parsing
+     */
+      $parse = new SpdxTwoImportSource($reportFilename);
+      $version = $parse->getVersion();
+      if($version == "2.2" || $version == "2.3"){
+        $importSource = new SpdxTwoImportSource($reportFilename);
+        if($importSource->parse()) {
+          return $importSource;
+        }
+      }
+      else{
+        $importSource = new SpdxThreeImportSource($reportFilename);
+        if($importSource->parse()) {
+          return $importSource;
+        }
       }
     }
 
